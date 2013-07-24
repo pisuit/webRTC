@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<h:head>
+	<script src="RTCMultiConnection-v1.2.js"></script>
+	<script src="socket.io.js"></script>
+</h:head>
+<body>
+	<input id="sessionid"/>
+	<button id="openbtn">Open</button>
+	<button id="connectbtn">Connect</button>
+	<button id="closebtn">Close</button>
+	<video id="localmedia" autoplay="true" />
+	<script>
+	var connection = new RTCMultiConnection();
+
+
+	
+	connection.onstream = function (stream) {
+	    if (stream.type === 'local') {
+	    	localmedia.src = stream.blobURL;
+	    }
+
+	    if (stream.type === 'remote') {
+	        document.body.appendChild(stream.mediaElement);
+	    }
+	}
+
+	document.getElementById("openbtn").onclick = function() {
+		connection.open(document.getElementById("sessionid").value);
+	};
+	
+	document.getElementById("connectbtn").onclick = function() {
+		connection.connect(document.getElementById("sessionid").value);
+	};
+
+	document.getElementById("closebtn").onclick = function() {
+		connection.autoCloseEntireSession = true;
+		connection.leave();
+	};
+
+	connection.openSignalingChannel = function(config) {
+		   var URL = 'http://172.16.72.137:8888/';
+		   var channel = config.channel || this.channel || 'default-channel';
+		   var sender = Math.round(Math.random() * 60535) + 5000;
+
+		   io.connect(URL).emit('new-channel', {
+		      channel: channel,
+		      sender : sender
+		   });
+
+		   var socket = io.connect(URL + channel);
+		   socket.channel = channel;
+
+		   socket.on('connect', function () {
+		      if (config.callback) config.callback(socket);
+		   });
+
+		   socket.send = function (message) {
+		        socket.emit('message', {
+		            sender: sender,
+		            data  : message
+		        });
+		    };
+
+		   socket.on('message', config.onmessage);
+		};
+	</script>
+</body>
+</html>

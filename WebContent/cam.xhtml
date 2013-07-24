@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+
+</h:head>
+<body>
+	<p:dialog header="Local Cam" widgetVar="localcam">
+		<video id="sourcevid" autoplay="true" style="width:100%;height:100%" />
+	</p:dialog>
+	<p:dialog header="Remote Cam" widgetVar="remotecam">
+		<video id="remotevid" autoplay="true" style="width:100%;height:100%" />
+	</p:dialog>
+	<p:commandButton value="Start Video"
+		onclick="startVideo();localcam.show()" />
+	<p:commandButton value="Stop Video"
+		onclick="stopVideo();localcam.hide()" />
+	<p:commandButton value="Connect" onclick="connect();remotecam.show()" />
+	<p:commandButton value="Disconnect"
+		onclick="onHangUp();remotecam.hide()" />
+
+	<script src="main.js" />
+</body>
+</html>
